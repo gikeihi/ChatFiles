@@ -3,8 +3,7 @@ import os
 
 from flask import Flask, request, make_response
 
-from chat import create_llama_index, get_answer_from_index, check_llama_index_exists, get_answer_from_graph, \
-    create_llama_graph_index
+from chat import create_llama_index, get_answer_from_index, check_llama_index_exists
 
 from file import get_index_path, get_index_name_from_file_path, check_index_file_exists, \
     get_index_name_without_json_extension, clean_file, check_file_is_compressed, index_path, compress_path, \
@@ -36,14 +35,14 @@ def upload_file():
             return make_response(
                 {"indexName": get_index_name_without_json_extension(index_name), "indexType": "index"}), 200
 
-        else:
-            filepaths = decompress_files_and_get_filepaths(uploaded_file)
-            if filepaths is not None:
-                graph_name, graph = create_llama_graph_index(filepaths)
-
-            clean_files(filepaths)
-            return make_response(
-                {"indexName": get_index_name_without_json_extension(graph_name), "indexType": "graph"}), 200
+        # else:
+        #     filepaths = decompress_files_and_get_filepaths(uploaded_file)
+        #     if filepaths is not None:
+        #         graph_name, graph = create_llama_graph_index(filepaths)
+        #
+        #     clean_files(filepaths)
+        #     return make_response(
+        #         {"indexName": get_index_name_without_json_extension(graph_name), "indexType": "graph"}), 200
 
     except Exception as e:
         # cleanup temp file
@@ -63,10 +62,8 @@ def query_from_llama_index():
 
         if index_type == 'index':
             answer = get_answer_from_index(message, index_name)
-        elif index_type == 'graph':
-            answer = get_answer_from_graph(message, index_name)
 
-        return make_response(str(answer.response)), 200
+        return make_response(answer.response_gen), 200
     except Exception as e:
         return "Error: {}".format(str(e)), 500
 
@@ -81,4 +78,4 @@ if __name__ == '__main__':
         os.makedirs(compress_path)
     if os.environ.get('CHAT_FILES_MAX_SIZE') is not None:
         app.config['MAX_CONTENT_LENGTH'] = int(os.environ.get('CHAT_FILES_MAX_SIZE'))
-    app.run(port=5000, host='0.0.0.0', debug=args.debug)
+    app.run(port=8090, host='0.0.0.0', debug=args.debug)

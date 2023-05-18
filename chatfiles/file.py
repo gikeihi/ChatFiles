@@ -25,11 +25,11 @@ def get_index_name_from_compress_filepath(file_name):
 
 
 def get_index_name_without_json_extension(index_name):
-    return index_name.replace(".json", "")
+    return index_name
 
 
 def get_name_with_json_extension(index_name):
-    return index_name + '.json'
+    return index_name
 
 
 def get_index_filepath(index_name):
@@ -41,7 +41,7 @@ def get_index_path():
 
 
 def check_index_file_exists(index_name):
-    return get_index_filepath(index_name).is_file()
+    return get_index_filepath(index_name).is_dir()
 
 
 def check_index_exists(index_name):
