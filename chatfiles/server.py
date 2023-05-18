@@ -1,15 +1,16 @@
 import argparse
 import os
 
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, Response
 
 from chat import create_llama_index, get_answer_from_index, check_llama_index_exists
 
 from file import get_index_path, get_index_name_from_file_path, check_index_file_exists, \
     get_index_name_without_json_extension, clean_file, check_file_is_compressed, index_path, compress_path, \
     decompress_files_and_get_filepaths, clean_files, check_index_exists
-
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/upload', methods=['POST'])
@@ -63,7 +64,7 @@ def query_from_llama_index():
         if index_type == 'index':
             answer = get_answer_from_index(message, index_name)
 
-        return make_response(answer.response_gen), 200
+        return Response(answer.response_gen, mimetype='text/event-stream')
     except Exception as e:
         return "Error: {}".format(str(e)), 500
 
